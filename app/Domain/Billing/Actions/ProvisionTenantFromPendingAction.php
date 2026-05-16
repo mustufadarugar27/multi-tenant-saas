@@ -25,7 +25,7 @@ final class ProvisionTenantFromPendingAction
             'subscription_status' => 'active',
         ]);
 
-        $tenant->domains()->create(['domain' => 'app.' . $pending->slug . '.com']);
+        $tenant->domains()->create(['domain' => $pending->slug . '.' . config('app.base_domain')]);
 
         tenancy()->initialize($tenant);
 
