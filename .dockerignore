@@ -1,0 +1,38 @@
+# Dependencies (installed in Docker)
+vendor/
+node_modules/
+
+# Local env – never bake secrets into image
+.env
+.env.*
+!.env.example
+
+# Version control
+.git/
+.gitignore
+
+# Docker files (not needed inside image)
+docker-compose*.yml
+Dockerfile
+
+# IDE / OS
+.idea/
+.vscode/
+*.DS_Store
+*.swp
+
+# Tests
+tests/
+phpunit.xml
+
+# Logs & temp
+storage/logs/*.log
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+
+# CI / GitHub
+.github/
+
+# Note: resources/js and resources/css must NOT be excluded –
+# the node-builder stage needs them to compile Vite assets.

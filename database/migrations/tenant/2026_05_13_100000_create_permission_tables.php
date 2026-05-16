@@ -1,0 +1,81 @@
+<?php
+
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+/**
+ * Spatie Laravel Permission tables — custom migration.
+ *
+ * Uses string/uuid for model_id (our User PKs are UUIDs).
+ * Teams disabled — roles are global, user assignments are tenant-scoped.
+ */
+return new class extends Migration
+{
+    public function up(): void
+    {
+        $tableNames   = config('permission.table_names');
+        $columnNames  = config('permission.column_names');
+        $pivotRole    = $columnNames['role_pivot_key'] ?? 'role_id';
+        $pivotPerm    = $columnNames['permission_pivot_key'] ?? 'permission_id';
+        $morphKey     = $columnNames['model_morph_key'];
+
+        Schema::create($tableNames['permissions'], function (Blueprint $table): void {
+            $table->id();
+            $table->string('name');
+            $table->string('guard_name');
+            $table->timestamps();
+            $table->unique(['name', 'guard_name']);
+        });
+
+        Schema::create($tableNames['roles'], function (Blueprint $table): void {
+            $table->id();
+            $table->string('name');
+            $table->string('guard_name');
+            $table->timestamps();
+            $table->unique(['name', 'guard_name']);
+        });
+
+        Schema::create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $pivotPerm, $morphKey): void {
+            $table->unsignedBigInteger($pivotPerm);
+            $table->string('model_type');
+            $table->uuid($morphKey);   // UUID — matches our User PK
+            $table->index([$morphKey, 'model_type'], 'model_has_permissions_model_id_model_type_index');
+            $table->foreign($pivotPerm)->references('id')->on($tableNames['permissions'])->cascadeOnDelete();
+            $table->primary([$pivotPerm, $morphKey, 'model_type'], 'model_has_permissions_permission_model_type_primary');
+        });
+
+        Schema::create($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames, $pivotRole, $morphKey): void {
+            $table->unsignedBigInteger($pivotRole);
+            $table->string('model_type');
+            $table->uuid($morphKey);   // UUID — matches our User PK
+            $table->index([$morphKey, 'model_type'], 'model_has_roles_model_id_model_type_index');
+            $table->foreign($pivotRole)->references('id')->on($tableNames['roles'])->cascadeOnDelete();
+            $table->primary([$pivotRole, $morphKey, 'model_type'], 'model_has_roles_role_model_type_primary');
+        });
+
+        Schema::create($tableNames['role_has_permissions'], function (Blueprint $table) use ($tableNames, $pivotRole, $pivotPerm): void {
+            $table->unsignedBigInteger($pivotPerm);
+            $table->unsignedBigInteger($pivotRole);
+            $table->foreign($pivotPerm)->references('id')->on($tableNames['permissions'])->cascadeOnDelete();
+            $table->foreign($pivotRole)->references('id')->on($tableNames['roles'])->cascadeOnDelete();
+            $table->primary([$pivotPerm, $pivotRole], 'role_has_permissions_permission_id_role_id_primary');
+        });
+
+        app('cache')
+            ->store(config('permission.cache.store') !== 'default' ? config('permission.cache.store') : null)
+            ->forget(config('permission.cache.key'));
+    }
+
+    public function down(): void
+    {
+        $tableNames = config('permission.table_names');
+
+        Schema::drop($tableNames['role_has_permissions']);
+        Schema::drop($tableNames['model_has_roles']);
+        Schema::drop($tableNames['model_has_permissions']);
+        Schema::drop($tableNames['roles']);
+        Schema::drop($tableNames['permissions']);
+    }
+};
