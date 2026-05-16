@@ -81,17 +81,16 @@ class TaskObserver
             $task->completed_at = null;
         }
 
+        $fromLabel = EnumConfig::label('task_status', $from);
+        $toLabel   = EnumConfig::label('task_status', $to);
+
         TaskHistory::create([
             'task_id'   => $task->id,
             'user_id'   => $userId,
             'event'     => 'status_changed',
             'field'     => 'status',
-            'old_value' => $from,
-            'new_value' => $to,
-            'context'   => [
-                'from_label' => EnumConfig::label('task_status', $from),
-                'to_label'   => EnumConfig::label('task_status', $to),
-            ],
+            'old_value' => $fromLabel,
+            'new_value' => $toLabel,
         ]);
     }
 }

@@ -82,7 +82,7 @@ class ProjectService
         if ($dto->has('start_date')) { $data['start_date'] = $dto->startDate; }
         if ($dto->has('end_date')) { $data['end_date'] = $dto->endDate; }
         if ($dto->has('budget')) { $data['budget'] = $dto->budget; }
-        if ($dto->has('status')) { $data['status'] = $dto->status->value; }
+        if ($dto->has('status')) { $data['status'] = $dto->status; }
 
         $updated = $this->repository->update($project, $data);
 

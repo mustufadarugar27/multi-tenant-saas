@@ -106,11 +106,11 @@
                     </div>
                     <div class="px-6 py-3.5">
                         <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Created</dt>
-                        <dd class="text-sm text-gray-900">{{ $project->created_at->format('M j, Y g:i A') }}</dd>
+                        <dd class="text-sm text-gray-900">{{ $project->created_at->setTimezone('Asia/Kolkata')->format('M j, Y g:i A') }}</dd>
                     </div>
                     <div class="px-6 py-3.5">
                         <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Last updated</dt>
-                        <dd class="text-sm text-gray-900">{{ $project->updated_at->format('M j, Y g:i A') }}</dd>
+                        <dd class="text-sm text-gray-900">{{ $project->updated_at->setTimezone('Asia/Kolkata')->format('M j, Y g:i A') }}</dd>
                     </div>
                 </dl>
             </div>
@@ -123,13 +123,11 @@
                 <h2 class="text-sm font-semibold text-gray-900">Tasks</h2>
             </div>
             @if (isset($projectTasks))
-                {{-- @dd($projectTasks) --}}
                 <ul class="divide-y divide-gray-100">
                     @foreach ($projectTasks as $entry)
                         <li class="px-6 py-3.5 flex items-start gap-3">
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm text-gray-700">
-                                    {{-- <span class="font-medium text-gray-900">{{ $entry?->name ?? 'System' }}</span> --}}
                                     <a href="{{ route('tenant.tasks.show', $entry->id) }}"
                                         class="text-indigo-600 hover:underline">
                                         {{ $entry->title }}

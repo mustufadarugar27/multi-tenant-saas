@@ -92,7 +92,7 @@
                     @if ($task->completed_at)
                         <div class="px-6 py-3.5 flex gap-4">
                             <dt class="w-36 shrink-0 text-sm font-medium text-gray-500">Completed at</dt>
-                            <dd class="text-sm text-gray-900">{{ $task->completed_at->format('M j, Y g:i A') }}</dd>
+                            <dd class="text-sm text-gray-900">{{ $task->completed_at->setTimezone('Asia/Kolkata')->format('M j, Y g:i A') }}</dd>
                         </div>
                     @endif
                 </dl>
@@ -158,11 +158,11 @@
                     @endif
                     <div class="px-6 py-3.5">
                         <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Created</dt>
-                        <dd class="text-sm text-gray-900">{{ $task->created_at->format('M j, Y g:i A') }}</dd>
+                        <dd class="text-sm text-gray-900">{{ $task->created_at->setTimezone('Asia/Kolkata')->format('M j, Y g:i A') }}</dd>
                     </div>
                     <div class="px-6 py-3.5">
                         <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Last updated</dt>
-                        <dd class="text-sm text-gray-900">{{ $task->updated_at->format('M j, Y g:i A') }}</dd>
+                        <dd class="text-sm text-gray-900">{{ $task->updated_at->setTimezone('Asia/Kolkata')->format('M j, Y g:i A') }}</dd>
                     </div>
                 </dl>
             </div>
