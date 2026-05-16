@@ -12,13 +12,6 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Queue\SerializesModels;
 
-/**
- * Broadcast project mutations to the project channel.
- *
- * Implements ShouldBeUnique so rapid consecutive updates (e.g. inline edits)
- * are deduplicated within the 5-second uniqueness window — only the final
- * state is fanned out to subscribers.
- */
 class ProjectUpdatedBroadcast implements ShouldBroadcast, ShouldBeUnique
 {
     use InteractsWithSockets, SerializesModels;
@@ -53,7 +46,7 @@ class ProjectUpdatedBroadcast implements ShouldBroadcast, ShouldBeUnique
             'project' => [
                 'id' => $this->project->id,
                 'name' => $this->project->name,
-                'status' => $this->project->status->value,
+                'status' => $this->project->status,
             ],
             'changes' => $this->changes,
             'actor' => [

@@ -12,7 +12,6 @@ class LangTranslationServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Skip during artisan commands (migrate, seed, etc.) — DB may not exist yet.
         if ($this->app->runningInConsole()) {
             return;
         }

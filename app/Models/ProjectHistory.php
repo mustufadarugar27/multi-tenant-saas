@@ -11,7 +11,6 @@ class ProjectHistory extends Model
 {
     use HasUuid;
 
-    // History is append-only — no updates, no deletes.
     public const UPDATED_AT = null;
 
     protected $fillable = [

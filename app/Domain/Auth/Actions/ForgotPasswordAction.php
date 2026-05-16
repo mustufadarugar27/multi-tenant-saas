@@ -19,7 +19,6 @@ class ForgotPasswordAction
             return null;
         }
 
-        // Clean old tokens for this email
         DB::table('password_reset_tokens')->where('email', $dto->email)->delete();
 
         $token = Str::random(64);

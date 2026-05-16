@@ -11,7 +11,6 @@ class AuditLog extends Model
 {
     use HasUuid;
 
-    // Audit logs are immutable append-only compliance records.
     public const UPDATED_AT = null;
 
     protected $fillable = [

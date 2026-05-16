@@ -47,8 +47,6 @@ final class ProvisionTenantFromPendingAction
 
         tenancy()->end();
 
-        // Update in central context — after tenancy()->end() the default
-        // connection is restored to the central DB.
         $pending->update(['status' => 'completed']);
 
         return $tenant;

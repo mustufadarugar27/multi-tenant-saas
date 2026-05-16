@@ -11,11 +11,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-/**
- * Prunes audit logs that have exceeded the regulatory retention period.
- * Default retention is 365 days — adjust via the $retentionDays parameter
- * to match the applicable regulatory requirement (GDPR = 90d, SOC2 = 365d, etc.).
- */
 class PruneAuditLogsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;

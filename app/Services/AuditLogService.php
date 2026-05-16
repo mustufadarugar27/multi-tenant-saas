@@ -9,11 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class AuditLogService
 {
-    /**
-     * Record a security or compliance audit event.
-     * Audit logs are always written synchronously — they are compliance records
-     * and must not be lost if the queue worker is down.
-     */
     public function record(
         string $action,
         string $status = 'success',
@@ -38,9 +33,6 @@ class AuditLogService
         ]);
     }
 
-    /**
-     * Shorthand for recording a failed security event (login failure, unauthorized access, etc.).
-     */
     public function failure(
         string $action,
         ?User $actor = null,
@@ -54,9 +46,6 @@ class AuditLogService
         );
     }
 
-    /**
-     * Record a data mutation with before/after snapshots for compliance diff.
-     */
     public function mutation(
         string $action,
         Model $resource,

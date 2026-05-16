@@ -12,10 +12,6 @@ class ActivityLogService
 {
     private const QUEUE = 'activity-logs';
 
-    /**
-     * Dispatch an activity log entry asynchronously.
-     * Falls back to synchronous write if the queue connection is `sync`.
-     */
     public function log(
         User $actor,
         string $event,
@@ -37,9 +33,6 @@ class ActivityLogService
         LogActivityJob::dispatch($payload)->onQueue(self::QUEUE);
     }
 
-    /**
-     * Synchronous write — use only when the caller cannot tolerate a queue.
-     */
     public function logSync(
         User $actor,
         string $event,
@@ -59,9 +52,6 @@ class ActivityLogService
         ]);
     }
 
-    /**
-     * Log a system-initiated event with no human actor.
-     */
     public function logSystem(
         string $event,
         string $description,

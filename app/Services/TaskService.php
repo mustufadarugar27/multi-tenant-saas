@@ -67,8 +67,8 @@ class TaskService
             'description' => $dto->description,
             'assigned_to' => $dto->assignedTo,
             'created_by' => $actor->id,
-            'priority' => $dto->priority->value,
-            'status' => $dto->status->value,
+            'priority' => $dto->priority,
+            'status' => $dto->status,
             'due_date' => $dto->dueDate,
             'estimated_hours' => $dto->estimatedHours,
         ]);

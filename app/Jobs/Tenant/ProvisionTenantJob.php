@@ -11,13 +11,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-/**
- * stancl's QueueTenancyBootstrapper (configured in config/tenancy.php)
- * automatically serializes the current tenant into every queued job and
- * re-initializes tenancy() when the job is picked up by a worker.
- *
- * No custom base class or middleware is needed — stancl handles it.
- */
 class ProvisionTenantJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -32,7 +25,6 @@ class ProvisionTenantJob implements ShouldQueue
 
     public function handle(): void
     {
-        // tenancy() is already initialised by stancl's QueueTenancyBootstrapper.
         $tenant = Tenant::find($this->newTenantId);
 
         if ($tenant === null) {

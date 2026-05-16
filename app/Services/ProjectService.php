@@ -57,7 +57,7 @@ class ProjectService
             'start_date' => $dto->startDate,
             'end_date' => $dto->endDate,
             'budget' => $dto->budget,
-            'status' => $dto->status->value,
+            'status' => $dto->status,
             'created_by' => $actor->id,
         ]);
 

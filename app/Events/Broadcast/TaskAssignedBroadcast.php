@@ -11,10 +11,6 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Queue\SerializesModels;
 
-/**
- * Broadcast to the assignee's private user channel only.
- * Queued so it does not block the web request.
- */
 class TaskAssignedBroadcast implements ShouldBroadcast
 {
     use InteractsWithSockets, SerializesModels;
@@ -27,7 +23,6 @@ class TaskAssignedBroadcast implements ShouldBroadcast
         public readonly User $assignee,
         string $tenantId,
     ) {
-        // Store at construct time; tenant() may not be available at broadcast time.
         $this->tenantId = $tenantId;
     }
 
@@ -49,9 +44,9 @@ class TaskAssignedBroadcast implements ShouldBroadcast
             'task' => [
                 'id' => $this->task->id,
                 'title' => $this->task->title,
-                'priority' => $this->task->priority->value,
+                'priority' => $this->task->priority,
                 'due_date' => $this->task->due_date?->toDateString(),
-                'status' => $this->task->status->value,
+                'status' => $this->task->status,
             ],
             'project_id' => $this->task->project_id,
             'assigned_by' => [

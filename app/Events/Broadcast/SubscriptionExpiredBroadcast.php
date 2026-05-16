@@ -9,10 +9,6 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Queue\SerializesModels;
 
-/**
- * Broadcast subscription expiry to the entire tenant channel.
- * All connected users receive this so the UI can prompt re-subscription.
- */
 class SubscriptionExpiredBroadcast implements ShouldBroadcast
 {
     use InteractsWithSockets, SerializesModels;

@@ -18,7 +18,6 @@ class RegisterCompanyAction
     {
         $slug = $dto->slug ?: Str::slug($dto->companyName);
 
-        // Create tenant in central DB — TenancyServiceProvider provisions the DB synchronously
         $tenant = Tenant::create([
             'id'           => Str::uuid()->toString(),
             'name'         => $dto->companyName,
@@ -30,7 +29,6 @@ class RegisterCompanyAction
 
         $tenant->domains()->create(['domain' => 'app.' . $slug . '.com']);
 
-        // Switch to tenant DB to create the first user
         tenancy()->initialize($tenant);
 
         try {
