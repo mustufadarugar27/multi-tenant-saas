@@ -1,4 +1,3 @@
-# ─── Stage 1: Node – build frontend assets ───────────────────────────────────
 FROM node:20-alpine AS node-builder
 
 WORKDIR /app
@@ -9,7 +8,6 @@ RUN npm ci --prefer-offline
 COPY . .
 RUN npm run build
 
-# ─── Stage 2: PHP dependencies (no dev) ──────────────────────────────────────
 FROM composer:2.7 AS composer-builder
 
 WORKDIR /app
@@ -31,7 +29,6 @@ RUN APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA= \
     REVERB_APP_ID=placeholder \
     composer dump-autoload --classmap-authoritative --no-dev
 
-# ─── Stage 3: Production image ────────────────────────────────────────────────
 FROM php:8.2-fpm-alpine AS production
 
 LABEL org.opencontainers.image.source="https://github.com/your-org/multi-tenant-saas"
