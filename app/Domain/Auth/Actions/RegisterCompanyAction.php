@@ -27,7 +27,7 @@ class RegisterCompanyAction
             'settings'     => ['admin_email' => $dto->email],
         ]);
 
-        $tenant->domains()->create(['domain' => 'app.' . $slug . '.com']);
+        $tenant->domains()->create(['domain' => $slug . '.' . config('app.base_domain')]);
 
         tenancy()->initialize($tenant);
 
