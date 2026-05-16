@@ -1,6 +1,6 @@
 # Multi-Tenant SaaS Platform
 
-A production-ready **multi-tenant SaaS project management platform** built with Laravel 11. Each tenant (company) runs in a completely isolated MySQL database. The platform supports team collaboration with projects, tasks, comments, attachments, real-time updates, and a full subscription billing cycle powered by Stripe.
+A **multi-tenant SaaS project management platform** built with Laravel 11. Each tenant (company) runs in a completely isolated MySQL database. The platform supports team collaboration with projects, tasks, comments, attachments, real-time updates, and a full subscription billing cycle powered by Stripe.
 
 ---
 
@@ -15,19 +15,19 @@ A production-ready **multi-tenant SaaS project management platform** built with 
 | **Project Management** | Projects → Tasks → Comments / Attachments, with status transitions and immutable audit history |
 | **Real-time** | Laravel Reverb (WebSocket) — live task assignments, comments, and subscription events |
 | **PDF Invoices** | DomPDF-generated invoice PDFs emailed on each payment |
-| **Docker** | Full `docker-compose` stack (PHP-FPM + Nginx + MySQL 8 + Redis 7) |
+| **Queue Dashboard** | Laravel Horizon — monitor and retry queued jobs via `/horizon` |
 
 ---
 
 ## Tech Stack
 
 - **Backend:** Laravel 11, PHP 8.2
-- **Database:** MySQL 8 (central DB + per-tenant DB), Redis (cache + queues)
+- **Database:** MySQL 8 (central DB + per-tenant DB), Redis (cache + queues + sessions)
 - **Auth:** Laravel Sanctum, Spatie Permission
 - **Billing:** Stripe PHP SDK, DomPDF
 - **Real-time:** Laravel Reverb (self-hosted WebSocket server)
+- **Queue:** Laravel Horizon
 - **Frontend:** Blade templates, Tailwind CSS, Vite
-- **Architecture:** Domain-Driven Design — `app/Domain/`, Actions, DTOs, Repositories
 
 ---
 
@@ -45,26 +45,123 @@ A production-ready **multi-tenant SaaS project management platform** built with 
 
 ```
 app/
-├── Actions/          # Single-responsibility use cases (RegisterTenant, HandleStripeWebhook…)
-├── DataTransferObjects/
 ├── Domain/           # Domain events and aggregates
 ├── Http/
 │   ├── Controllers/Api/
 │   ├── Controllers/Web/
-│   ├── Middleware/   # CheckSubscriptionActive, EnforceTenantScope…
+│   ├── Middleware/
 │   ├── Requests/
 │   └── Resources/
-├── Infrastructure/   # Cache, Queue helpers, Eloquent global scopes
-├── Listeners/        # Queued event listeners (afterCommit)
 ├── Models/           # Tenant-aware Eloquent models
-├── Notifications/    # Email notifications (welcome, invoice, expiry…)
 ├── Providers/
 ├── Repositories/
-└── Services/         # ProjectService, TaskService, ActivityLogService…
+└── Services/
 
 database/
 ├── migrations/        # Central DB migrations
 └── migrations/tenant/ # Per-tenant DB migrations (run via Tenancy)
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/) and Docker Compose
+- A [Stripe](https://stripe.com) account (for paid plans)
+
+That's it. PHP, Node, MySQL, and Redis all run inside containers.
+
+---
+
+### First-time Setup
+
+```bash
+# 1. Clone the repository
+git clone <repo-url>
+cd multi-tenant-saas
+
+# 2. Run setup — copies .env.example → .env, builds containers,
+#    installs dependencies, generates app key, runs migrations
+make setup
+
+# 3. Fill in your Stripe keys in .env
+#    STRIPE_KEY, STRIPE_SECRET, STRIPE_WEBHOOK_SECRET
+#    STRIPE_*_PRICE_ID for each plan/cycle
+
+# 4. Seed the plans
+make artisan db:seed --class=PlanSeeder
+```
+
+The app is now running at **http://localhost**.
+
+---
+
+### Docker Services
+
+| Service | Description | Port |
+|---|---|---|
+| `nginx` | Web server | `80` |
+| `app` | PHP 8.5-FPM | — |
+| `mysql` | MySQL 8 | `3306` |
+| `redis` | Redis 7 | `6379` |
+| `horizon` | Queue dashboard | `/horizon` |
+| `reverb` | WebSocket server | `8080` |
+| `node` | Vite dev server (HMR) | `5173` |
+| `phpmyadmin` | DB management UI | `8081` |
+
+---
+
+### Make Commands
+
+```bash
+make help          # Show all available commands
+
+make up            # Start all containers
+make down          # Stop all containers
+make logs          # Follow logs from all containers
+
+make artisan <cmd> # Run php artisan inside app container
+make composer <cmd># Run composer inside app container
+make php <cmd>     # Run php inside app container
+make npm <cmd>     # Run npm inside node container
+make node <cmd>    # Run node inside node container
+```
+
+Examples:
+
+```bash
+make artisan migrate
+make artisan migrate:fresh --seed
+make artisan tinker
+make composer require vendor/package
+make npm install
+```
+
+---
+
+## Tenant Subdomains
+
+Tenants access their workspace via subdomain: `{subdomain}.localhost`.
+
+For local development you may need to add entries to `/etc/hosts`:
+
+```
+127.0.0.1  tenant1.localhost
+127.0.0.1  tenant2.localhost
+```
+
+---
+
+## Stripe Webhook Setup
+
+```bash
+# Using the Stripe CLI (local development)
+stripe listen --forward-to http://localhost/api/stripe/webhook
+
+# Copy the signing secret shown and set it in .env:
+STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
 ---
@@ -92,93 +189,17 @@ private-tenant.{tenantId}.user.{userId}       ← task assignments
 
 ---
 
-## Getting Started
-
-### Prerequisites
-
-- PHP 8.2+
-- Composer
-- Node.js 18+
-- MySQL 8
-- Redis
-- A [Stripe](https://stripe.com) account (for paid plans)
-
-### Local Setup
-
-```bash
-# 1. Clone the repository
-git clone <repo-url>
-cd multi-tenant-saas
-
-# 2. Install dependencies
-composer install
-npm install
-
-# 3. Configure environment
-cp .env.example .env
-php artisan key:generate
-
-# 4. Configure .env
-#    Set DB_HOST, DB_DATABASE, DB_USERNAME, DB_PASSWORD
-#    Set APP_BASE_DOMAIN (e.g. app.test)
-#    Set STRIPE_KEY, STRIPE_SECRET, STRIPE_WEBHOOK_SECRET
-#    Set Stripe Price IDs for each plan/cycle
-
-# 5. Run central database migrations and seed plans
-php artisan migrate
-php artisan db:seed --class=PlanSeeder
-
-# 6. Build frontend assets
-npm run build
-
-# 7. Start all services (server + queue + reverb + vite)
-composer run dev
-```
-
-The app will be available at `http://localhost:8000`. Tenants access their workspace via subdomain: `app.{subdomain}.com`.
-
----
-
-### Docker Setup
-
-```bash
-# Copy and configure environment
-cp .env.example .env
-# Edit .env with your Stripe keys
-
-# Build and start all containers
-docker compose up -d --build
-
-# Run migrations inside the container
-docker compose exec app php artisan migrate
-docker compose exec app php artisan db:seed --class=PlanSeeder
-```
-
-The app will be available at `http://localhost:8001`.
-
----
-
-## Stripe Webhook Setup
-
-```bash
-# Using the Stripe CLI (for local development)
-stripe listen --forward-to http://localhost:8001/api/stripe/webhook
-
-# Copy the webhook signing secret and set in .env:
-STRIPE_WEBHOOK_SECRET=whsec_...
-```
-
----
-
 ## Environment Variables Reference
 
 | Variable | Description |
 |---|---|
-| `APP_BASE_DOMAIN` | Base domain for tenant subdomains (e.g. `app.test`) |
+| `APP_BASE_DOMAIN` | Central domain — tenants use `{slug}.{APP_BASE_DOMAIN}` |
+| `DB_HOST` | MySQL host — `mysql` when using Docker |
+| `REDIS_HOST` | Redis host — `redis` when using Docker |
 | `STRIPE_KEY` | Stripe publishable key |
 | `STRIPE_SECRET` | Stripe secret key |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
-| `STRIPE_*_MONTHLY_PRICE_ID` | Stripe Price IDs for each plan/cycle |
+| `STRIPE_*_PRICE_ID` | Stripe Price IDs for each plan/cycle |
 | `BILLING_TRIAL_DAYS` | Trial period in days (default: 14) |
 | `BILLING_GRACE_PERIOD_DAYS` | Grace period after subscription expires (default: 3) |
 | `REVERB_APP_KEY` | Laravel Reverb app key |
@@ -190,10 +211,8 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 ## Running Tests
 
 ```bash
-php artisan test
+make artisan test
 ```
-
-The test suite covers tenant isolation, authentication flows, role/permission enforcement, token management, password reset, and failed login tracking.
 
 ---
 
@@ -201,16 +220,16 @@ The test suite covers tenant isolation, authentication flows, role/permission en
 
 | Command | Description |
 |---|---|
-| `php artisan tenants:migrate` | Run tenant migrations across all tenant databases |
-| `php artisan billing:check-expired` | Check and update expired subscriptions (runs daily via scheduler) |
-| `php artisan reverb:start` | Start the WebSocket server |
-| `php artisan queue:listen` | Process queued jobs (broadcasts, emails, tenant provisioning) |
+| `make artisan tenants:migrate` | Run tenant migrations across all tenant databases |
+| `make artisan billing:check-expired` | Check and update expired subscriptions |
+| `make artisan horizon:snapshot` | Take a Horizon metrics snapshot |
+| `make artisan queue:clear` | Clear all pending jobs from the queue |
 
 ---
 
 ## Security
 
-- **Tenant isolation:** three independent layers — separate MySQL database per tenant, `EnforceTenantScope` global Eloquent scope, and `CheckSubscriptionActive` middleware gate.
+- **Tenant isolation:** separate MySQL database per tenant + `CheckSubscriptionActive` middleware gate.
 - **API auth:** Sanctum bearer tokens with rotation (`/api/v1/auth/refresh`) and bulk revocation (`/api/v1/auth/logout-all`).
 - **File uploads:** MIME whitelist enforced server-side, 20 MB cap, tenant-scoped storage paths.
 - **Stripe webhooks:** signature verification via `STRIPE_WEBHOOK_SECRET` on every inbound webhook.
