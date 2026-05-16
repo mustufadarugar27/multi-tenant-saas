@@ -23,9 +23,6 @@ class TaskAssignedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        // 'database' is handled synchronously in HandleTaskAssigned to guarantee
-        // immediate insertion regardless of queue worker availability.
-        // 'broadcast' is handled by BroadcastTaskAssigned listener via the tenant-aware channel.
         return ['mail'];
     }
 
@@ -51,7 +48,7 @@ class TaskAssignedNotification extends Notification implements ShouldQueue
             'type' => 'task_assigned',
             'task_id' => $this->task->id,
             'task_title' => $this->task->title,
-            'priority' => $this->task->priority->value,
+            'priority' => $this->task->priority,
             'due_date' => $this->task->due_date?->toDateString(),
             'assigned_by' => [
                 'id' => $this->assignedBy->id,
@@ -66,7 +63,7 @@ class TaskAssignedNotification extends Notification implements ShouldQueue
             'type' => 'task_assigned',
             'task_id' => $this->task->id,
             'task_title' => $this->task->title,
-            'priority' => $this->task->priority->value,
+            'priority' => $this->task->priority,
             'due_date' => $this->task->due_date?->toDateString(),
             'assigned_by' => [
                 'id' => $this->assignedBy->id,

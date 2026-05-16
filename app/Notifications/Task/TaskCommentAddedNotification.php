@@ -40,10 +40,12 @@ class TaskCommentAddedNotification extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
+            'type' => 'comment_added',
             'task_id' => $this->task->id,
             'task_title' => $this->task->title,
             'comment_id' => $this->comment->id,
             'commenter_id' => $this->commenter->id,
+            'commenter' => $this->commenter->name,
         ];
     }
 

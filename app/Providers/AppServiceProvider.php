@@ -20,6 +20,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        date_default_timezone_set(config('app.timezone'));
+
         Task::observe(TaskObserver::class);
         Project::observe(ProjectObserver::class);
 

@@ -7,10 +7,6 @@ use App\Events\Broadcast\ProjectUpdatedBroadcast;
 use App\Events\ProjectUpdated;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-/**
- * Queued listener: dispatches ProjectUpdatedBroadcast which implements
- * ShouldBeUnique — rapid consecutive updates are deduplicated automatically.
- */
 class BroadcastProjectUpdated implements ShouldQueue
 {
     public string $queue = 'broadcasts';

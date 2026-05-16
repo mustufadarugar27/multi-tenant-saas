@@ -10,7 +10,6 @@ class ProvisionTenantOnCreated
 {
     public function handle(TenantCreated $event): void
     {
-        // Dispatch async — provisioning should not block the registration HTTP response.
         ProvisionTenantJob::dispatch($event->tenant->id);
     }
 }

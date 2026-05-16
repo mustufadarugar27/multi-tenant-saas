@@ -10,7 +10,7 @@ A **multi-tenant SaaS project management platform** built with Laravel 11. Each 
 |---|---|
 | **Multi-Tenancy** | Per-database isolation via `stancl/tenancy` v3.10 |
 | **Authentication** | Laravel Sanctum — token-based API + session-based Web |
-| **Authorization** | Role-based access control via Spatie Permission + Policies |
+| **Authorization** | Role-based access control via Policies |
 | **Billing** | Stripe Checkout — 3 plans (Starter / Professional / Enterprise), monthly & yearly cycles |
 | **Project Management** | Projects → Tasks → Comments / Attachments, with status transitions and immutable audit history |
 | **Real-time** | Laravel Reverb (WebSocket) — live task assignments, comments, and subscription events |

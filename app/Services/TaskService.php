@@ -67,8 +67,8 @@ class TaskService
             'description' => $dto->description,
             'assigned_to' => $dto->assignedTo,
             'created_by' => $actor->id,
-            'priority' => $dto->priority->value,
-            'status' => $dto->status->value,
+            'priority' => $dto->priority,
+            'status' => $dto->status,
             'due_date' => $dto->dueDate,
             'estimated_hours' => $dto->estimatedHours,
         ]);
@@ -102,8 +102,8 @@ class TaskService
         if ($dto->has('title')) { $data['title'] = $dto->title; }
         if ($dto->has('description')) { $data['description'] = $dto->description; }
         if ($dto->has('assigned_to')) { $data['assigned_to'] = $dto->assignedTo; }
-        if ($dto->has('priority')) { $data['priority'] = $dto->priority->value; }
-        if ($dto->has('status')) { $data['status'] = $dto->status->value; }
+        if ($dto->has('priority')) { $data['priority'] = $dto->priority; }
+        if ($dto->has('status')) { $data['status'] = $dto->status; }
         if ($dto->has('due_date')) { $data['due_date'] = $dto->dueDate; }
         if ($dto->has('estimated_hours')) { $data['estimated_hours'] = $dto->estimatedHours; }
         if ($dto->has('actual_hours')) { $data['actual_hours'] = $dto->actualHours; }

@@ -7,10 +7,6 @@ use App\Events\Broadcast\CommentAddedBroadcast;
 use App\Events\TaskCommentAdded;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-/**
- * Queued listener: fans out new comment to all task-channel subscribers.
- * afterCommit ensures the comment row is visible before we broadcast.
- */
 class BroadcastCommentAdded implements ShouldQueue
 {
     public string $queue = 'broadcasts';

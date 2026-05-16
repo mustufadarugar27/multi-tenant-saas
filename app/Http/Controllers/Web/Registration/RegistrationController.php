@@ -38,7 +38,6 @@ class RegistrationController extends Controller
             return redirect()->away($result['checkout_url']);
         }
 
-        // Free plan — provision directly
         $this->provision->execute($result['pending']);
 
         return redirect()->route('register.success');

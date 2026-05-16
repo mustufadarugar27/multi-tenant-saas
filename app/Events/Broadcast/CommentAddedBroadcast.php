@@ -12,10 +12,6 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Queue\SerializesModels;
 
-/**
- * Broadcast to everyone watching the task channel.
- * The sender is excluded on the client side via socket_id.
- */
 class CommentAddedBroadcast implements ShouldBroadcast
 {
     use InteractsWithSockets, SerializesModels;

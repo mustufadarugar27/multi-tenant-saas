@@ -9,10 +9,6 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\PasswordReset;
 
-/**
- * Maps Laravel auth events to audit log records.
- * Register each auth event → this listener in EventServiceProvider.
- */
 class RecordAuditEvent
 {
     public function __construct(

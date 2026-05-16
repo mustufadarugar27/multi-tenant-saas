@@ -11,17 +11,13 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-/**
- * Moves activity logs older than the configured retention period to the archive table.
- * Scheduled via the Artisan command or the scheduler in console.php.
- */
 class ArchiveActivityLogsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $timeout = 300; // 5 min — bulk inserts may take time on large tables
+    public int $timeout = 300;
 
-    public int $tries = 1;     // Archival is idempotent on the same day, so no retry needed
+    public int $tries = 1;
 
     public function __construct(
         public readonly int $olderThanDays = 90,

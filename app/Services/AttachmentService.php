@@ -33,7 +33,6 @@ class AttachmentService
         'application/x-zip-compressed',
     ];
 
-    // Extensions that are blocked regardless of declared MIME type (defense in depth)
     private const BLOCKED_EXTENSIONS = [
         'exe', 'bat', 'sh', 'cmd', 'ps1', 'vbs', 'js', 'jar',
         'app', 'dmg', 'msi', 'dll', 'so', 'php', 'py', 'rb',
@@ -83,7 +82,6 @@ class AttachmentService
             ],
         ]);
 
-        // Queue async scan — does not block the HTTP response.
         ProcessTaskAttachmentJob::dispatch($attachment)->onQueue('attachments');
 
         $this->activityLog->log(
@@ -118,9 +116,6 @@ class AttachmentService
         AttachmentDeleted::dispatch($attachment, $actor);
     }
 
-    /**
-     * Download URL with short-lived signed token (prevents direct storage access).
-     */
     public function downloadUrl(TaskAttachment $attachment): string
     {
         if (! $attachment->isSafe()) {
@@ -142,7 +137,6 @@ class AttachmentService
             ]);
         }
 
-        // Double-check MIME using finfo (reads actual bytes, not just extension).
         $detectedMime = $this->resolvedMimeType($file);
 
         if (! in_array($detectedMime, self::ALLOWED_MIME_TYPES, true)) {
@@ -154,7 +148,6 @@ class AttachmentService
 
     private function resolvedMimeType(UploadedFile $file): string
     {
-        // finfo reads file bytes for MIME, not the client-supplied Content-Type.
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
         $detected = $finfo->file($file->getRealPath());
 
