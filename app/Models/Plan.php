@@ -15,6 +15,7 @@ class Plan extends Model
         'price_monthly',
         'price_yearly',
         'features',
+        'limits',
         'max_users',
         'max_projects',
         'storage_gb',
@@ -22,6 +23,7 @@ class Plan extends Model
         'stripe_yearly_price_id',
         'is_active',
         'is_free',
+        'is_default',
         'sort_order',
     ];
 
@@ -29,10 +31,12 @@ class Plan extends Model
     {
         return [
             'features'      => 'array',
+            'limits'        => 'array',
             'price_monthly' => 'float',
             'price_yearly'  => 'float',
             'is_active'     => 'boolean',
             'is_free'       => 'boolean',
+            'is_default'    => 'boolean',
             'max_users'     => 'integer',
             'max_projects'  => 'integer',
             'storage_gb'    => 'integer',

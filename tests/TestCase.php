@@ -14,4 +14,13 @@ abstract class TestCase extends BaseTestCase
 
         Cache::flush();
     }
+
+    protected function tearDown(): void
+    {
+        if (tenancy()->initialized) {
+            tenancy()->end();
+        }
+
+        parent::tearDown();
+    }
 }

@@ -29,13 +29,13 @@ class TaskPolicy
 
     public function create(User $user): bool
     {
-        return $user->role->canManageProjects();
+        return $user->canManageProjects();
     }
 
     public function update(User $user, Task $task): bool
     {
         // Assignee can update their own task; managers+ can update any.
-        return $user->role->canManageProjects()
+        return $user->canManageProjects()
             || $task->assigned_to === $user->id;
     }
 
@@ -56,7 +56,7 @@ class TaskPolicy
 
     public function uploadAttachment(User $user, Task $task): bool
     {
-        return $user->role->canManageProjects()
+        return $user->canManageProjects()
             || $task->assigned_to === $user->id;
     }
 

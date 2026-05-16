@@ -3,7 +3,7 @@
 
 namespace App\Models;
 
-use App\Support\EnumConfig;
+use App\Support\Enums\TenantStatus;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
@@ -36,7 +36,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     protected function casts(): array
     {
         return [
-            'status'              => 'string',
+            'status'              => TenantStatus::class,
             'subscription_status' => 'string',
             'billing_cycle'       => 'string',
             'settings'            => 'array',
@@ -75,12 +75,12 @@ class Tenant extends BaseTenant implements TenantWithDatabase
 
     public function isActive(): bool
     {
-        return EnumConfig::isTenantStatusActive($this->status);
+        return $this->status === TenantStatus::Active;
     }
 
     public function isSuspended(): bool
     {
-        return $this->status === 'suspended';
+        return $this->status === TenantStatus::Suspended;
     }
 
     public function isSubscriptionActive(): bool

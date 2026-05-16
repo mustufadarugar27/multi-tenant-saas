@@ -7,10 +7,8 @@ use App\Models\Project;
 use App\Models\Task;
 use App\Models\TaskComment;
 use App\Models\User;
-use App\Support\Enums\ProjectStatus;
-use App\Support\Enums\TaskPriority;
-use App\Support\Enums\TaskStatus;
 use App\Support\Enums\UserRole;
+use App\Support\LangTranslations;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -23,6 +21,8 @@ final class TenantSeeder extends Seeder
 {
     public function run(): void
     {
+        LangTranslations::flush();
+
         $this->call(RoleAndPermissionSeeder::class);
 
         [$admin, $manager, $employees] = $this->seedUsers();
@@ -72,7 +72,7 @@ final class TenantSeeder extends Seeder
             ]
         );
 
-        $user->assignRole($role->spatieRoleName());
+        $user->assignRole($role->value);
 
         return $user;
     }
@@ -84,7 +84,7 @@ final class TenantSeeder extends Seeder
             [
                 'name'        => 'Bharat E-Commerce Portal',
                 'description' => 'Full redesign of the company website with modern UI/UX tailored for Indian consumers.',
-                'status'      => ProjectStatus::Active,
+                'status'      => 'active',
                 'start_date'  => now()->subDays(20),
                 'end_date'    => now()->addDays(40),
                 'budget'      => '15000.00',
@@ -93,7 +93,7 @@ final class TenantSeeder extends Seeder
             [
                 'name'        => 'DigiPay Mobile App',
                 'description' => 'Build a cross-platform UPI-integrated mobile payment application.',
-                'status'      => ProjectStatus::Draft,
+                'status'      => 'draft',
                 'start_date'  => now()->addDays(5),
                 'end_date'    => now()->addDays(90),
                 'budget'      => '40000.00',
@@ -102,7 +102,7 @@ final class TenantSeeder extends Seeder
             [
                 'name'        => 'GST Records Migration',
                 'description' => 'Migrate all GST billing records from the old ERP to the new system.',
-                'status'      => ProjectStatus::Completed,
+                'status'      => 'completed',
                 'start_date'  => now()->subDays(60),
                 'end_date'    => now()->subDays(5),
                 'budget'      => '8000.00',
@@ -111,7 +111,7 @@ final class TenantSeeder extends Seeder
             [
                 'name'        => 'Employee Self-Service Portal',
                 'description' => 'Self-service HR portal for leave requests, payslips, and PF management.',
-                'status'      => ProjectStatus::OnHold,
+                'status'      => 'on_hold',
                 'start_date'  => now()->subDays(10),
                 'end_date'    => now()->addDays(60),
                 'budget'      => '12000.00',
@@ -151,7 +151,7 @@ final class TenantSeeder extends Seeder
                 'due_date'        => $def['due_date'],
                 'estimated_hours' => $def['estimated_hours'],
                 'actual_hours'    => $def['actual_hours'],
-                'completed_at'    => $def['status'] === TaskStatus::Done ? now() : null,
+                'completed_at'    => $def['status'] === 'done' ? now() : null,
             ]);
 
             $this->seedCommentsForTask($task, $creator, $assignee);
@@ -187,15 +187,15 @@ final class TenantSeeder extends Seeder
     }
 
 
-    private function taskDefinitionsFor(ProjectStatus $status): array
+    private function taskDefinitionsFor(string $status): array
     {
         return match ($status) {
-            ProjectStatus::Active => [
+            'active' => [
                 [
                     'title'           => 'Design homepage wireframes in Hindi & English',
                     'description'     => 'Create bilingual low-fidelity and hi-fi wireframes for the landing page.',
-                    'status'          => TaskStatus::Done,
-                    'priority'        => TaskPriority::High,
+                    'status'          => 'done',
+                    'priority'        => 'high',
                     'assignee'        => 'employee',
                     'due_date'        => now()->subDays(5),
                     'estimated_hours' => '8.00',
@@ -204,8 +204,8 @@ final class TenantSeeder extends Seeder
                 [
                     'title'           => 'Implement regional language switcher',
                     'description'     => 'Build the navigation with support for Hindi, Tamil, and English toggling.',
-                    'status'          => TaskStatus::InProgress,
-                    'priority'        => TaskPriority::High,
+                    'status'          => 'in_progress',
+                    'priority'        => 'high',
                     'assignee'        => 'employee',
                     'due_date'        => now()->addDays(3),
                     'estimated_hours' => '6.00',
@@ -214,8 +214,8 @@ final class TenantSeeder extends Seeder
                 [
                     'title'           => 'Set up CI/CD pipeline',
                     'description'     => 'Configure GitHub Actions for automated deploy to staging server.',
-                    'status'          => TaskStatus::InReview,
-                    'priority'        => TaskPriority::Medium,
+                    'status'          => 'in_review',
+                    'priority'        => 'medium',
                     'assignee'        => 'manager',
                     'due_date'        => now()->addDays(2),
                     'estimated_hours' => '4.00',
@@ -224,8 +224,8 @@ final class TenantSeeder extends Seeder
                 [
                     'title'           => 'Write About Us content',
                     'description'     => 'Draft and review the company About page copy in Hindi and English.',
-                    'status'          => TaskStatus::Todo,
-                    'priority'        => TaskPriority::Low,
+                    'status'          => 'todo',
+                    'priority'        => 'low',
                     'assignee'        => 'employee',
                     'due_date'        => now()->addDays(14),
                     'estimated_hours' => '2.00',
@@ -234,8 +234,8 @@ final class TenantSeeder extends Seeder
                 [
                     'title'           => 'Mobile performance audit',
                     'description'     => 'Run Lighthouse audits targeting low-bandwidth Indian networks (2G/3G).',
-                    'status'          => TaskStatus::Blocked,
-                    'priority'        => TaskPriority::Critical,
+                    'status'          => 'blocked',
+                    'priority'        => 'critical',
                     'assignee'        => 'employee',
                     'due_date'        => now()->addDays(7),
                     'estimated_hours' => '5.00',
@@ -243,12 +243,12 @@ final class TenantSeeder extends Seeder
                 ],
             ],
 
-            ProjectStatus::Draft => [
+            'draft' => [
                 [
                     'title'           => 'Define UPI integration scope',
                     'description'     => 'Document must-have UPI, NEFT, and wallet features for the MVP.',
-                    'status'          => TaskStatus::Todo,
-                    'priority'        => TaskPriority::High,
+                    'status'          => 'todo',
+                    'priority'        => 'high',
                     'assignee'        => 'manager',
                     'due_date'        => now()->addDays(10),
                     'estimated_hours' => '4.00',
@@ -257,8 +257,8 @@ final class TenantSeeder extends Seeder
                 [
                     'title'           => 'Choose cross-platform framework',
                     'description'     => 'Evaluate React Native vs Flutter for UPI deep-link requirements.',
-                    'status'          => TaskStatus::Todo,
-                    'priority'        => TaskPriority::Medium,
+                    'status'          => 'todo',
+                    'priority'        => 'medium',
                     'assignee'        => 'employee',
                     'due_date'        => now()->addDays(12),
                     'estimated_hours' => '3.00',
@@ -266,12 +266,12 @@ final class TenantSeeder extends Seeder
                 ],
             ],
 
-            ProjectStatus::Completed => [
+            'completed' => [
                 [
                     'title'           => 'Export GST invoices from legacy ERP',
                     'description'     => 'Extract all GSTIN, HSN codes, and invoice records as CSV.',
-                    'status'          => TaskStatus::Done,
-                    'priority'        => TaskPriority::Critical,
+                    'status'          => 'done',
+                    'priority'        => 'critical',
                     'assignee'        => 'employee',
                     'due_date'        => now()->subDays(40),
                     'estimated_hours' => '6.00',
@@ -280,8 +280,8 @@ final class TenantSeeder extends Seeder
                 [
                     'title'           => 'Data cleansing and PAN deduplication',
                     'description'     => 'Remove duplicates and normalise PAN, Aadhaar-linked mobile formats.',
-                    'status'          => TaskStatus::Done,
-                    'priority'        => TaskPriority::High,
+                    'status'          => 'done',
+                    'priority'        => 'high',
                     'assignee'        => 'employee',
                     'due_date'        => now()->subDays(30),
                     'estimated_hours' => '10.00',
@@ -290,8 +290,8 @@ final class TenantSeeder extends Seeder
                 [
                     'title'           => 'Validate imported GST records',
                     'description'     => 'Spot-check 10% of records against GSTN portal for accuracy.',
-                    'status'          => TaskStatus::Done,
-                    'priority'        => TaskPriority::Medium,
+                    'status'          => 'done',
+                    'priority'        => 'medium',
                     'assignee'        => 'manager',
                     'due_date'        => now()->subDays(10),
                     'estimated_hours' => '4.00',
@@ -299,12 +299,12 @@ final class TenantSeeder extends Seeder
                 ],
             ],
 
-            ProjectStatus::OnHold => [
+            'on_hold' => [
                 [
                     'title'           => 'Gather HR and PF requirements',
                     'description'     => 'Interview stakeholders and document leave, PF, and payslip portal needs.',
-                    'status'          => TaskStatus::Done,
-                    'priority'        => TaskPriority::High,
+                    'status'          => 'done',
+                    'priority'        => 'high',
                     'assignee'        => 'manager',
                     'due_date'        => now()->subDays(8),
                     'estimated_hours' => '5.00',
@@ -313,8 +313,8 @@ final class TenantSeeder extends Seeder
                 [
                     'title'           => 'Initial database schema design',
                     'description'     => 'ERD and schema for leave requests, payslips, PF contributions, and employees.',
-                    'status'          => TaskStatus::InProgress,
-                    'priority'        => TaskPriority::Medium,
+                    'status'          => 'in_progress',
+                    'priority'        => 'medium',
                     'assignee'        => 'employee',
                     'due_date'        => now()->addDays(20),
                     'estimated_hours' => '6.00',

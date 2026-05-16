@@ -10,9 +10,12 @@ final class LangTranslations
 {
     private const CACHE_KEY = 'lang_translations';
 
+    /** @var array<string, array>|null */
+    private static ?array $memory = null;
+
     public static function all(): array
     {
-        return Cache::rememberForever(self::CACHE_KEY, fn () => self::loadFromDb());
+        return self::$memory ??= Cache::rememberForever(self::CACHE_KEY, fn () => self::loadFromDb());
     }
 
     public static function group(string $group): array
@@ -49,6 +52,7 @@ final class LangTranslations
 
     public static function flush(): void
     {
+        self::$memory = null;
         Cache::forget(self::CACHE_KEY);
     }
 

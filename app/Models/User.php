@@ -7,6 +7,7 @@ use App\Support\Concerns\HasUuid;
 use App\Support\EnumConfig;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -19,6 +20,7 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasApiTokens, HasFactory, HasRoles, HasUuid, Notifiable, SoftDeletes;
 
     protected $fillable = [
+        'tenant_id',
         'name',
         'email',
         'password',
@@ -50,6 +52,11 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class, 'tenant_id', 'id');
+    }
+
     public function activityLogs(): HasMany
     {
         return $this->hasMany(ActivityLog::class, 'user_id');
@@ -68,6 +75,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function canManageTenant(): bool
     {
         return EnumConfig::userRoleCanManageTenant($this->role);
+    }
+
+    public function canManageProjects(): bool
+    {
+        return EnumConfig::userRoleCanManageProjects($this->role);
     }
 
     public function canManageUsers(): bool

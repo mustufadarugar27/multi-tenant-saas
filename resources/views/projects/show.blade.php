@@ -121,9 +121,6 @@
         <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-100">
                 <h2 class="text-sm font-semibold text-gray-900">Tasks</h2>
-                <a class="mr-0" href="{{ route('tenant.tasks.create') }}" class="text-indigo-600 hover:underline">
-                    Create
-                </a>
             </div>
             @if (isset($projectTasks))
                 {{-- @dd($projectTasks) --}}

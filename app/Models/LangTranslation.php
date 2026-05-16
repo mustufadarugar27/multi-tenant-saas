@@ -4,9 +4,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Stancl\Tenancy\Database\Concerns\CentralConnection;
 
 final class LangTranslation extends Model
 {
+    use CentralConnection;
     protected $fillable = [
         'group',
         'key',

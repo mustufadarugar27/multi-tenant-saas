@@ -1,16 +1,6 @@
 <?php
 
 
-use App\Http\Controllers\Api\V1\Auth\ActivityLogController;
-use App\Http\Controllers\Api\V1\Auth\AuthController;
-use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
-use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
-use App\Http\Controllers\Api\V1\Auth\PermissionController;
-use App\Http\Controllers\Api\V1\Auth\RoleController;
-use App\Http\Controllers\Api\V1\Project\ProjectController as ApiProjectController;
-use App\Http\Controllers\Api\V1\Task\TaskAttachmentController;
-use App\Http\Controllers\Api\V1\Task\TaskCommentController;
-use App\Http\Controllers\Api\V1\Task\TaskController as ApiTaskController;
 use App\Http\Controllers\Web\Auth\LoginController;
 use App\Http\Controllers\Web\Billing\BillingController;
 use App\Http\Controllers\Web\Notification\NotificationController as WebNotificationController;
@@ -18,7 +8,6 @@ use App\Http\Controllers\Web\Project\ProjectController as WebProjectController;
 use App\Http\Controllers\Web\Task\TaskController as WebTaskController;
 use App\Http\Controllers\Web\User\UserController as WebUserController;
 use App\Http\Middleware\CheckSubscriptionActive;
-use App\Http\Middleware\EnsureEmailIsVerified;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -128,87 +117,3 @@ Route::middleware([
     });
 });
 
-Route::prefix('api/v1')->name('tenant.api.')->middleware([
-    'api',
-    InitializeTenancyByDomain::class,
-    PreventAccessFromCentralDomains::class,
-])->group(function (): void {
-
-    Route::prefix('auth')->name('auth.')->group(function (): void {
-        Route::post('login', [AuthController::class, 'login'])
-            ->middleware('throttle:10,1')
-            ->name('login');
-
-        Route::post('forgot-password', [PasswordResetController::class, 'forgotPassword'])
-            ->middleware('throttle:5,1')
-            ->name('password.forgot');
-
-        Route::post('reset-password', [PasswordResetController::class, 'resetPassword'])
-            ->middleware('throttle:5,1')
-            ->name('password.reset');
-    });
-
-    Route::middleware('auth:sanctum')->group(function (): void {
-
-        Route::prefix('auth')->name('auth.')->group(function (): void {
-            Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-            Route::post('logout-all', [AuthController::class, 'logoutAll'])->name('logout.all');
-            Route::post('refresh', [AuthController::class, 'refresh'])->name('refresh');
-            Route::get('me', [AuthController::class, 'me'])->name('me');
-
-            Route::get('email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
-                ->middleware('signed')
-                ->name('verification.verify');
-
-            Route::post('email/resend', [EmailVerificationController::class, 'resend'])
-                ->middleware('throttle:6,1')
-                ->name('verification.resend');
-        });
-
-        Route::middleware([EnsureEmailIsVerified::class])
-            ->group(function (): void {
-
-                // RBAC — roles
-                Route::get('roles', [RoleController::class, 'index'])->name('roles.index');
-                Route::post('users/{userId}/roles', [RoleController::class, 'assign'])->name('roles.assign');
-                Route::delete('users/{userId}/roles/{role}', [RoleController::class, 'revoke'])->name('roles.revoke');
-
-                // RBAC — permissions
-                Route::get('permissions', [PermissionController::class, 'index'])->name('permissions.index');
-                Route::get('roles/{role}/permissions', [PermissionController::class, 'forRole'])->name('permissions.for-role');
-                Route::post('roles/{role}/permissions/{permission}', [PermissionController::class, 'grantToRole'])->name('permissions.grant');
-                Route::delete('roles/{role}/permissions/{permission}', [PermissionController::class, 'revokeFromRole'])->name('permissions.revoke');
-
-                // Activity logs
-                Route::get('activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
-                Route::get('activity-logs/me', [ActivityLogController::class, 'mine'])->name('activity-logs.mine');
-
-                // Projects
-                Route::post('projects/{project}/restore', [ApiProjectController::class, 'restore'])
-                    ->name('projects.restore')
-                    ->withTrashed();
-                Route::apiResource('projects', ApiProjectController::class);
-
-                // Tasks
-                Route::post('tasks/{task}/restore', [ApiTaskController::class, 'restore'])
-                    ->name('tasks.restore')
-                    ->withTrashed();
-                Route::get('tasks/{task}/history', [ApiTaskController::class, 'history'])
-                    ->name('tasks.history');
-                Route::apiResource('tasks', ApiTaskController::class);
-
-                // Task comments (nested)
-                Route::apiResource('tasks.comments', TaskCommentController::class)
-                    ->only(['index', 'store', 'update', 'destroy'])
-                    ->shallow();
-
-                // Task attachments (nested)
-                Route::get('tasks/{task}/attachments', [TaskAttachmentController::class, 'index'])
-                    ->name('tasks.attachments.index');
-                Route::post('tasks/{task}/attachments', [TaskAttachmentController::class, 'store'])
-                    ->name('tasks.attachments.store');
-                Route::delete('tasks/{task}/attachments/{attachment}', [TaskAttachmentController::class, 'destroy'])
-                    ->name('tasks.attachments.destroy');
-            });
-    });
-});

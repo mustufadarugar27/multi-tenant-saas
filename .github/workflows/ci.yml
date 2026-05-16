@@ -29,6 +29,9 @@ jobs:
           extensions: pdo, pdo_sqlite, pdo_mysql, mbstring, bcmath, zip, gd, pcntl, intl, redis
           coverage: none
 
+      - name: Copy env for testing
+        run: cp .env.example .env
+
       - name: Cache Composer packages
         uses: actions/cache@v4
         with:
@@ -38,9 +41,6 @@ jobs:
 
       - name: Install PHP dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
-
-      - name: Copy env for testing
-        run: cp .env.example .env || cp .env .env.bak
 
       - name: Generate app key
         run: php artisan key:generate --env=testing

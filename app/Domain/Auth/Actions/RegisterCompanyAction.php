@@ -33,21 +33,25 @@ class RegisterCompanyAction
         // Switch to tenant DB to create the first user
         tenancy()->initialize($tenant);
 
-        $user = User::create([
-            'name'     => $dto->name,
-            'email'    => $dto->email,
-            'password' => $dto->password,
-            'role'     => 'super_admin',
-            'is_active' => true,
-        ]);
+        try {
+            $user = User::create([
+                'name'     => $dto->name,
+                'email'    => $dto->email,
+                'password' => $dto->password,
+                'role'     => 'super_admin',
+                'is_active' => true,
+            ]);
 
-        $user->assignRole('super_admin');
+            $user->assignRole('super_admin');
 
-        Artisan::call('db:seed', ['--class' => TenantSeeder::class, '--force' => true]);
+            Artisan::call('db:seed', ['--class' => TenantSeeder::class, '--force' => true]);
 
-        $token = $user->createToken('api')->plainTextToken;
+            $token = $user->createToken('api')->plainTextToken;
 
-        event(new UserRegistered($user));
+            event(new UserRegistered($user));
+        } finally {
+            tenancy()->end();
+        }
 
         return compact('user', 'tenant', 'token');
     }

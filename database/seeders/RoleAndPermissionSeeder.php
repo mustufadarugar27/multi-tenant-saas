@@ -3,7 +3,6 @@
 
 namespace Database\Seeders;
 
-use App\Support\LangTranslations;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -125,10 +124,10 @@ final class RoleAndPermissionSeeder extends Seeder
         }
 
         // Create roles and assign permissions
-        foreach (LangTranslations::keys('user_role') as $roleName) {
+        foreach (array_keys(self::ROLE_PERMISSIONS) as $roleName) {
             $roleModel = Role::firstOrCreate(['name' => $roleName, 'guard_name' => 'sanctum']);
 
-            $permissions = self::ROLE_PERMISSIONS[$roleName] ?? [];
+            $permissions = self::ROLE_PERMISSIONS[$roleName];
 
             if ($permissions === '*') {
                 $roleModel->syncPermissions(Permission::all());
@@ -136,14 +135,5 @@ final class RoleAndPermissionSeeder extends Seeder
                 $roleModel->syncPermissions($permissions);
             }
         }
-
-        $this->command->info('Roles and permissions seeded successfully.');
-        $this->command->table(
-            ['Role', 'Permissions'],
-            collect(LangTranslations::keys('user_role'))->map(fn (string $roleName) => [
-                LangTranslations::attr('user_role', $roleName, 'label', $roleName),
-                Role::where('name', $roleName)->first()?->permissions->count() . ' permissions',
-            ])->toArray()
-        );
     }
 }

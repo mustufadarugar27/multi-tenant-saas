@@ -29,12 +29,12 @@ class ProjectPolicy
 
     public function create(User $user): bool
     {
-        return $user->role->canManageProjects();
+        return $user->canManageProjects();
     }
 
     public function update(User $user, Project $project): bool
     {
-        return $user->role->canManageProjects();
+        return $user->canManageProjects();
     }
 
     public function delete(User $user, Project $project): bool

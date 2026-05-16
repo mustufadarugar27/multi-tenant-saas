@@ -67,7 +67,7 @@ class CreateTenantWithDomain extends Command
             [
                 ['Tenant',    $tenant->name],
                 ['Slug',      $tenant->slug],
-                ['Status',    $tenant->status],
+                ['Status',    $tenant->status->value],
                 ['Database',  $tenant->id],
                 ['Tables',    (string) $tableCount],
                 ['Domain',    $domain->domain],
