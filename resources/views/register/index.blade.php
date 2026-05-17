@@ -110,7 +110,7 @@
                     <p class="text-gray-400 text-xs mt-1">Run <code class="font-mono bg-gray-100 px-1 rounded">make artisan db:seed --class=PlanSeeder</code> to seed them.</p>
                 </div>
                 @else
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-3">
                     @foreach ($plans as $plan)
                     <div class="plan-card rounded-2xl border-2 border-gray-200 bg-white relative
                             {{ $plan->is_default ? 'selected' : '' }}"
@@ -159,37 +159,16 @@
                             </div>
 
                             <ul class="space-y-2 mb-6 text-sm text-gray-600">
-                                @if ($plan->max_projects)
                                 <li class="flex items-center gap-2">
                                     <svg class="h-4 w-4 text-indigo-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                    {{ $plan->max_projects }} projects
+                                    @if ($plan->max_users) Up to {{ $plan->max_users }} team members @else Unlimited team members @endif
                                 </li>
-                                @else
-                                <li class="flex items-center gap-2">
-                                    <svg class="h-4 w-4 text-indigo-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                    Unlimited projects
-                                </li>
-                                @endif
-
-                                @if ($plan->max_users)
-                                <li class="flex items-center gap-2">
-                                    <svg class="h-4 w-4 text-indigo-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                    Up to {{ $plan->max_users }} team members
-                                </li>
-                                @else
-                                <li class="flex items-center gap-2">
-                                    <svg class="h-4 w-4 text-indigo-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                    Unlimited team members
-                                </li>
-                                @endif
-
                                 @if ($plan->storage_gb)
                                 <li class="flex items-center gap-2">
                                     <svg class="h-4 w-4 text-indigo-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                                     {{ $plan->storage_gb }} GB storage
                                 </li>
                                 @endif
-
                                 @foreach ($plan->features ?? [] as $feat)
                                 <li class="flex items-center gap-2">
                                     <svg class="h-4 w-4 text-indigo-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
@@ -203,7 +182,10 @@
                                 {{ $plan->is_default
                                     ? 'bg-indigo-600 text-white hover:bg-indigo-700'
                                     : 'bg-gray-100 text-gray-700 hover:bg-indigo-600 hover:text-white' }}">
-                                {{ $plan->is_free ? 'Get started free' : 'Start free trial' }}
+                                @if ($plan->is_free) Get started free
+                                @elseif ($plan->slug === 'enterprise') Start enterprise trial
+                                @else Start free trial
+                                @endif
                             </button>
                         </div>
 

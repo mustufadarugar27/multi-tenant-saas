@@ -17,7 +17,6 @@ class Plan extends Model
         'features',
         'limits',
         'max_users',
-        'max_projects',
         'storage_gb',
         'stripe_monthly_price_id',
         'stripe_yearly_price_id',
@@ -38,7 +37,6 @@ class Plan extends Model
             'is_free'       => 'boolean',
             'is_default'    => 'boolean',
             'max_users'     => 'integer',
-            'max_projects'  => 'integer',
             'storage_gb'    => 'integer',
             'sort_order'    => 'integer',
         ];

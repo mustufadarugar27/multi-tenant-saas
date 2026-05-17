@@ -6,6 +6,7 @@ help:
 	@echo ""
 	@echo "Usage: make [command] [args]"
 	@echo ""
+	@echo "  setup                Full environment setup (up + migrate:fresh + seeders)"
 	@echo "  up                   Start all containers in background"
 	@echo "  down                 Stop and remove all containers"
 	@echo "  logs                 Follow logs from all containers"
@@ -22,6 +23,14 @@ help:
 	@echo "  make composer require vendor/pkg"
 	@echo "  make npm install"
 	@echo ""
+
+setup:
+	$(DC) up -d
+	@echo "Waiting for MySQL to be ready..."
+	@until docker compose exec mysql mysqladmin ping -u root -proot --silent 2>/dev/null; do sleep 2; done
+	$(APP) php artisan migrate:fresh
+	$(APP) php artisan db:seed --class=PlanSeeder
+	$(APP) php artisan db:seed --class=LangTranslationSeeder
 
 up:
 	$(DC) up -d
@@ -50,4 +59,4 @@ npm:
 %:
 	@:
 
-.PHONY: help up down logs artisan composer php node npm
+.PHONY: help setup up down logs artisan composer php node npm

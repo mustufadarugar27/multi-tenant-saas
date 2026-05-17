@@ -96,6 +96,18 @@
         }
         .billing-toggle-btn:not(.active) { color: #6b7280; }
         .billing-toggle-btn:not(.active):hover { color: #374151; }
+
+        /* Mobile menu transition */
+        #mobile-menu {
+            transition: max-height .25s ease, opacity .25s ease;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        #mobile-menu.open {
+            max-height: 300px;
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="antialiased" style="font-family:'Figtree',sans-serif;">
@@ -118,14 +130,39 @@
             <a href="#how-it-works" class="hidden sm:block text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">How it works</a>
             <a href="#pricing" class="hidden sm:block text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Pricing</a>
             <a href="{{ route('register.index') }}"
-               class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-sm">
+               class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-sm">
+                Get Started
+                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                </svg>
+            </a>
+            {{-- Hamburger (mobile only) --}}
+            <button id="mobile-menu-btn" class="sm:hidden p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors" aria-label="Toggle menu">
+                <svg id="icon-open" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+                <svg id="icon-close" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+    </div>
+
+    {{-- Mobile menu --}}
+    <div id="mobile-menu">
+        <div class="max-w-6xl mx-auto px-4 pb-4 flex flex-col gap-1">
+            <a href="#features" class="px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors" onclick="closeMobileMenu()">Features</a>
+            <a href="#how-it-works" class="px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors" onclick="closeMobileMenu()">How it works</a>
+            <a href="#pricing" class="px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors" onclick="closeMobileMenu()">Pricing</a>
+            <a href="{{ route('register.index') }}"
+               class="mt-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-sm">
                 Get Started
                 <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
                 </svg>
             </a>
         </div>
-
     </div>
 </nav>
 
@@ -239,9 +276,9 @@
 {{-- ═══════════════════════════════════════ STATS ════════════════════════════════════════ --}}
 <div class="bg-gray-50 border-b border-gray-100">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <dl class="grid grid-cols-3 gap-6 text-center">
+        <dl class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-center divide-y sm:divide-y-0 sm:divide-x divide-gray-200">
             @foreach ([['500+','Companies using it'],['99.9%','Uptime SLA'],['100%','Data isolation']] as $s)
-            <div>
+            <div class="py-4 sm:py-0 first:pt-0 last:pb-0">
                 <dt class="text-3xl font-extrabold text-indigo-600">{{ $s[0] }}</dt>
                 <dd class="mt-1 text-sm font-medium text-gray-500">{{ $s[1] }}</dd>
             </div>
@@ -262,7 +299,7 @@
             </p>
         </div>
 
-        <div class="grid sm:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
             @foreach ([
                 [
                     'path'  => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01',
@@ -311,7 +348,7 @@
             <p class="mt-4 text-gray-500 text-lg">No complex setup. No IT team required.</p>
         </div>
 
-        <div class="grid sm:grid-cols-3 gap-10 relative">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10 relative">
             <div class="step-connector hidden sm:block"></div>
 
             @foreach ([
@@ -319,12 +356,14 @@
                 ['02', 'Invite your team',          'Add team members and assign roles — manager, member, or admin. Everyone gets instant access to the shared workspace.'],
                 ['03', 'Start managing projects',   'Create projects, add tasks, set priorities, attach files, and watch your team collaborate live.'],
             ] as $step)
-            <div class="text-center relative">
-                <div class="h-14 w-14 rounded-full bg-indigo-600 text-white font-extrabold text-lg flex items-center justify-center mx-auto mb-5 shadow-md shadow-indigo-200 relative z-10">
+            <div class="flex sm:block items-start sm:text-center gap-5 sm:gap-0 relative">
+                <div class="h-14 w-14 flex-shrink-0 rounded-full bg-indigo-600 text-white font-extrabold text-lg flex items-center justify-center sm:mx-auto mb-0 sm:mb-5 shadow-md shadow-indigo-200 relative z-10">
                     {{ $step[0] }}
                 </div>
-                <h3 class="font-bold text-gray-900 mb-2">{{ $step[1] }}</h3>
-                <p class="text-gray-500 text-sm leading-relaxed max-w-xs mx-auto">{{ $step[2] }}</p>
+                <div class="pt-1 sm:pt-0">
+                    <h3 class="font-bold text-gray-900 mb-2">{{ $step[1] }}</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed sm:max-w-xs sm:mx-auto">{{ $step[2] }}</p>
+                </div>
             </div>
             @endforeach
         </div>
@@ -354,17 +393,17 @@
         </div>
 
         @if ($plans->isNotEmpty())
-        <div class="grid sm:grid-cols-3 gap-6 items-start">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 items-start">
             @foreach ($plans as $i => $plan)
             @php $highlight = $i === 1; @endphp
-            <div class="rounded-2xl border-2 p-7 flex flex-col relative transition-all duration-200
+            <div class="rounded-2xl border-2 p-6 sm:p-7 flex flex-col relative transition-all duration-200
                 {{ $highlight
-                    ? 'border-indigo-600 bg-indigo-600 shadow-2xl shadow-indigo-200'
+                    ? 'border-indigo-600 bg-indigo-600 shadow-2xl shadow-indigo-200 mt-0 sm:mt-0'
                     : 'border-gray-200 bg-white hover:border-indigo-300 hover:shadow-lg hover:shadow-indigo-50' }}">
 
                 @if ($highlight)
-                <div class="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                    <span class="bg-gradient-to-r from-violet-500 to-indigo-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">
+                <div class="flex justify-center mb-4 sm:mb-0 sm:absolute sm:-top-4 sm:left-1/2 sm:-translate-x-1/2">
+                    <span class="bg-gradient-to-r from-violet-500 to-indigo-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md whitespace-nowrap">
                         Most Popular
                     </span>
                 </div>
@@ -419,18 +458,6 @@
                         $lineColor = $highlight ? 'text-indigo-100' : 'text-gray-600';
                         $checkColor = $highlight ? 'text-indigo-200' : 'text-indigo-500';
                     @endphp
-
-                    @if ($plan->max_projects)
-                    <li class="flex items-start gap-2.5 text-sm {{ $lineColor }}">
-                        <svg class="h-4 w-4 mt-0.5 flex-shrink-0 {{ $checkColor }}" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                        {{ $plan->max_projects }} projects
-                    </li>
-                    @else
-                    <li class="flex items-start gap-2.5 text-sm {{ $lineColor }}">
-                        <svg class="h-4 w-4 mt-0.5 flex-shrink-0 {{ $checkColor }}" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                        Unlimited projects
-                    </li>
-                    @endif
 
                     @if ($plan->max_users)
                     <li class="flex items-start gap-2.5 text-sm {{ $lineColor }}">
@@ -510,6 +537,35 @@
 
         document.getElementById('btn-monthly').classList.toggle('active', !isYearly);
         document.getElementById('btn-yearly').classList.toggle('active', isYearly);
+    }
+
+    (function () {
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        const iconOpen = document.getElementById('icon-open');
+        const iconClose = document.getElementById('icon-close');
+        let open = false;
+
+        btn.addEventListener('click', function () {
+            open = !open;
+            menu.classList.toggle('open', open);
+            iconOpen.classList.toggle('hidden', open);
+            iconClose.classList.toggle('hidden', !open);
+        });
+
+        // Close on resize to sm+
+        window.addEventListener('resize', function () {
+            if (window.innerWidth >= 640 && open) closeMobileMenu();
+        });
+    })();
+
+    function closeMobileMenu() {
+        const menu = document.getElementById('mobile-menu');
+        const iconOpen = document.getElementById('icon-open');
+        const iconClose = document.getElementById('icon-close');
+        menu.classList.remove('open');
+        iconOpen.classList.remove('hidden');
+        iconClose.classList.add('hidden');
     }
 </script>
 
