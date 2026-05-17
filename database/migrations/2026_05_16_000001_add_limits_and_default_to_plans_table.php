@@ -11,14 +11,13 @@ return new class extends Migration
     {
         Schema::table('plans', function (Blueprint $table): void {
             $table->json('limits')->nullable()->after('features');
-            $table->boolean('is_default')->default(false)->after('is_free');
         });
     }
 
     public function down(): void
     {
         Schema::table('plans', function (Blueprint $table): void {
-            $table->dropColumn(['limits', 'is_default']);
+            $table->dropColumn('limits');
         });
     }
 };
